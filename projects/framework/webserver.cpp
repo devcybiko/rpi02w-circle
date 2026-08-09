@@ -71,10 +71,15 @@ CHTTPDaemon *CSDWebServer::CreateWorker (CNetSubSystem *pNetSubSystem, CSocket *
 	return new CSDWebServer (pNetSubSystem, m_pDocumentRoot, m_pTimer, m_pScreen, pSocket);
 }
 
-THTTPStatus CSDWebServer::GetContent (const char *pPath, const char *, const char *,
+THTTPStatus CSDWebServer::GetContent (const char *pPath, const char *, const char *pFormData,
 					       u8 *pBuffer, unsigned *pLength,
 					       const char **ppContentType)
 {
+	if (pPath != 0 && strcmp (pPath, "/action") == 0)
+	{
+		return GetAction (pFormData, pBuffer, pLength, ppContentType);
+	}
+
 	if (pPath != 0 && strcmp (pPath, "/status") == 0)
 	{
 		return GetStatus (pBuffer, pLength, ppContentType);
@@ -139,6 +144,28 @@ THTTPStatus CSDWebServer::GetContent (const char *pPath, const char *, const cha
 	return HTTPOK;
 }
 
+THTTPStatus CSDWebServer::GetAction (const char *pPayload, u8 *pBuffer,
+					      unsigned *pLength, const char **ppContentType)
+{
+	if (pBuffer == 0 || pLength == 0 || ppContentType == 0 || !IsJSONPayload (pPayload))
+	{
+		return HTTPBadRequest;
+	}
+
+	static const char Response[] = "{\"accepted\":true}\n";
+	if (sizeof Response - 1 > *pLength)
+	{
+		return HTTPInternalServerError;
+	}
+
+	// Action dispatch intentionally has no side effects yet. The payload is
+	// accepted here so future actions have a stable JSON endpoint.
+	memcpy (pBuffer, Response, sizeof Response - 1);
+	*pLength = sizeof Response - 1;
+	*ppContentType = "application/json; charset=utf-8";
+	return HTTPOK;
+}
+
 THTTPStatus CSDWebServer::GetStatus (u8 *pBuffer, unsigned *pLength,
 					      const char **ppContentType)
 {
@@ -193,11 +220,38 @@ boolean CSDWebServer::IsSafePath (const char *pPath) const
 
 	for (unsigned i = 0; i < nLength; i++)
 	{
-	if (pPath[i] == '\\' || (pPath[i] == '.' && pPath[i+1] == '.'))
+		if (pPath[i] == '\\' || (pPath[i] == '.' && pPath[i+1] == '.'))
 		{
 			return FALSE;
 		}
 	}
 
 	return GetContentType (pPath) != 0;
+}
+
+boolean CSDWebServer::IsJSONPayload (const char *pPayload) const
+{
+	if (pPayload == 0)
+	{
+		return FALSE;
+	}
+
+	while (*pPayload == ' ' || *pPayload == '\t' || *pPayload == '\r' || *pPayload == '\n')
+	{
+		pPayload++;
+	}
+	if (*pPayload != '{' && *pPayload != '[')
+	{
+		return FALSE;
+	}
+
+	const char *pEnd = pPayload + strlen (pPayload);
+	while (pEnd > pPayload && (pEnd[-1] == ' ' || pEnd[-1] == '\t'
+		|| pEnd[-1] == '\r' || pEnd[-1] == '\n'))
+	{
+		pEnd--;
+	}
+
+	return pEnd > pPayload
+		&& ((*pPayload == '{' && pEnd[-1] == '}') || (*pPayload == '[' && pEnd[-1] == ']'));
 }

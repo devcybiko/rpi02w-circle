@@ -20,6 +20,9 @@ public:
 
 private:
 	boolean IsSafePath (const char *pPath) const;
+	boolean IsJSONPayload (const char *pPayload) const;
+	THTTPStatus GetAction (const char *pPayload, u8 *pBuffer, unsigned *pLength,
+				const char **ppContentType);
 	THTTPStatus GetStatus (u8 *pBuffer, unsigned *pLength, const char **ppContentType);
 
 private:

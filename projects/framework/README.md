@@ -30,9 +30,7 @@ projects/framework/www/css/...     ->  SD:/www/css/...
 projects/framework/www/js/...      ->  SD:/www/js/...
 ```
 
-The Docker deployment script copies this directory automatically. For a manual
-SD-card deployment, copy the *contents* of `www/` into `/www/`, not the
-directory itself into `/www/www/`.
+The Docker deployment script copies this directory automatically.
 
 ### Static routes
 
@@ -71,6 +69,24 @@ After boot, use the WLAN address displayed in the serial log or on HDMI:
 ```text
 http://<pi-address>/
 http://<pi-address>/status
+```
+
+### Action API
+
+`POST /action` accepts a JSON object or array with `Content-Type:
+application/json`. It currently validates and acknowledges the payload but has
+no side effects. This endpoint is reserved for future runtime actions.
+
+```sh
+curl -X POST http://<pi-address>/action \
+  -H 'Content-Type: application/json' \
+  -d '{"action":"example"}'
+```
+
+The current response is:
+
+```json
+{"accepted":true}
 ```
 
 ## Build

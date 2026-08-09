@@ -5,6 +5,9 @@ set -e
 # Remove this project's generated files before entering the container so a
 # previous macOS/toolchain build cannot be reused by the container toolchain.
 docker exec -it circle-dev sh -c '
+	rm -f circle/lib/net/httpdaemon.d circle/lib/net/httpdaemon.o
+	make -C circle/lib/net CHECK_DEPS=0 httpdaemon.o
+	make -C circle/lib/net CHECK_DEPS=0 libnet.a
 	rm -f projects/framework/*.d projects/framework/*.o \
 		projects/framework/*.elf projects/framework/*.lst \
 		projects/framework/*.img projects/framework/*.map
