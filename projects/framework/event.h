@@ -13,11 +13,11 @@ enum class EventType : u16
 	Count
 };
 
-using EventMask = u32;
+using EventMask = u64;
 
 constexpr EventMask EventBit (EventType Type)
 {
-	return static_cast<EventMask> (1U) << static_cast<unsigned> (Type);
+	return static_cast<EventMask> (1ULL) << static_cast<unsigned> (Type);
 }
 
 static_assert (static_cast<unsigned> (EventType::Count) <= sizeof (EventMask) * 8,

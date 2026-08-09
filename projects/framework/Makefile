@@ -5,7 +5,9 @@ RASPPI = 3
 AARCH = 32
 
 OBJS = main.o kernel.o core.o core0.o core1.o core2.o core3.o \
-	   eventqueue.o eventrouter.o webserver.o
+	   eventqueue.o eventrouter.o executor.o keyboardservice.o mouseservice.o \
+	   networkservice.o screenservice.o service.o usbhostservice.o webserver.o \
+	   webserverservice.o
 
 DEFINE += -DARM_ALLOW_MULTI_CORE
 

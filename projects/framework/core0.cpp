@@ -1,9 +1,4 @@
 #include "core0.h"
-#include "webserver.h"
-
-#include <assert.h>
-#include <circle/string.h>
-#include <circle/util.h>
 
 #define DRIVE		"SD:"
 #define FIRMWARE_PATH	DRIVE "/firmware/"
@@ -12,43 +7,44 @@
 
 static const char FromCore0[] = "core0";
 
-CCore0 *CCore0::s_pThis = 0;
-
 CCore0::CCore0 (CEventRouter *pEventRouter)
 : CCore (pEventRouter, 0, FALSE),
-  m_Screen (m_Options.GetWidth (), m_Options.GetHeight ()),
+  m_ScreenService (m_Options.GetWidth (), m_Options.GetHeight ()),
   m_Timer (&m_Interrupt),
   m_Logger (m_Options.GetLogLevel (), &m_Timer),
-  m_USBHCI (&m_Interrupt, &m_Timer, TRUE),
+  m_USBHostService (&m_Interrupt, &m_Timer),
   m_EMMC (&m_Interrupt, &m_Timer, &m_ActLED),
   m_WLAN (FIRMWARE_PATH),
-  m_Net (0, 0, 0, 0, DEFAULT_HOSTNAME, NetDeviceTypeWLAN),
+  m_NetworkService (),
   m_WPASupplicant (CONFIG_FILE),
-  m_pKeyboard (0),
-  m_pMouse (0)
+  m_KeyboardService (&m_DeviceNameService, m_ScreenService.GetScreen ()),
+  m_MouseService (&m_DeviceNameService, m_ScreenService.GetScreen ()),
+  m_WebServerService (&m_NetworkService, &m_Timer,
+		      m_ScreenService.GetScreen (), WEB_ROOT)
 {
-	s_pThis = this;
 	m_ActLED.Blink (5);
 }
 
 CCore0::~CCore0 (void)
 {
-	s_pThis = 0;
 }
 
 boolean CCore0::Initialize (void)
 {
-	boolean bOK = m_Screen.Initialize ();
+	boolean bOK = m_ScreenService.InitService ();
 
 	if (bOK) bOK = m_Serial.Initialize (115200);
 	if (bOK)
 	{
 		CDevice *pTarget = m_DeviceNameService.GetDevice (m_Options.GetLogDevice (), FALSE);
-		bOK = m_Logger.Initialize (pTarget != 0 ? pTarget : &m_Screen);
+		bOK = m_Logger.Initialize (pTarget != 0 ? pTarget
+						 : m_ScreenService.GetScreen ());
 	}
 	if (bOK) bOK = m_Interrupt.Initialize ();
 	if (bOK) bOK = m_Timer.Initialize ();
-	if (bOK) bOK = m_USBHCI.Initialize ();
+	if (bOK) bOK = m_USBHostService.InitService ();
+	if (bOK) bOK = m_KeyboardService.InitService ();
+	if (bOK) bOK = m_MouseService.InitService ();
 	if (bOK) bOK = m_EMMC.Initialize ();
 	if (bOK && f_mount (&m_FileSystem, DRIVE, 1) != FR_OK)
 	{
@@ -56,8 +52,9 @@ boolean CCore0::Initialize (void)
 		bOK = FALSE;
 	}
 	if (bOK) bOK = m_WLAN.Initialize ();
-	if (bOK) bOK = m_Net.Initialize (FALSE);
+	if (bOK) bOK = m_NetworkService.InitService ();
 	if (bOK) bOK = m_WPASupplicant.Initialize ();
+	if (bOK) bOK = m_WebServerService.InitService ();
 
 	return bOK;
 }
@@ -67,40 +64,15 @@ void CCore0::Run (void)
 	m_Logger.Write (FromCore0, LogNotice, "Base framework built " __DATE__ " " __TIME__);
 	m_Logger.Write (FromCore0, LogNotice, "HDMI, SD, WLAN, USB keyboard and mouse are enabled");
 
-	boolean bReportedNetwork = FALSE;
-	boolean bWebServerStarted = FALSE;
 	for (;;)
 	{
 		ProcessEvents ();
 
-		// Must run at task level to detect devices connected after boot.
-		if (m_USBHCI.UpdatePlugAndPlay ())
-		{
-			AttachInputDevices ();
-		}
-
-		if (m_pKeyboard != 0)
-		{
-			m_pKeyboard->UpdateLEDs ();
-		}
-		if (m_pMouse != 0)
-		{
-			m_pMouse->UpdateCursor ();
-		}
-
-		if (!bReportedNetwork && m_Net.IsRunning ())
-		{
-			CString IPAddress;
-			m_Net.GetConfig ()->GetIPAddress ()->Format (&IPAddress);
-			m_Logger.Write (FromCore0, LogNotice, "WLAN connected: %s", (const char *) IPAddress);
-			bReportedNetwork = TRUE;
-		}
-		if (!bWebServerStarted && m_Net.IsRunning ())
-		{
-			new CSDWebServer (&m_Net, WEB_ROOT, &m_Timer, &m_Screen);
-			m_Logger.Write (FromCore0, LogNotice, "HTTP server listening on port 80 (root %s)", WEB_ROOT);
-			bWebServerStarted = TRUE;
-		}
+		m_USBHostService.Update ();
+		m_KeyboardService.Update ();
+		m_MouseService.Update ();
+		m_NetworkService.Update ();
+		m_WebServerService.Update ();
 
 		m_Scheduler.MsSleep (10);
 	}
@@ -109,59 +81,4 @@ void CCore0::Run (void)
 void CCore0::HandleEvent (const Event &)
 {
 	// Core 0 event handling will be added as event producers are connected.
-}
-
-void CCore0::AttachInputDevices (void)
-{
-	if (m_pKeyboard == 0)
-	{
-		m_pKeyboard = (CUSBKeyboardDevice *) m_DeviceNameService.GetDevice ("ukbd1", FALSE);
-		if (m_pKeyboard != 0)
-		{
-			m_pKeyboard->RegisterRemovedHandler (KeyboardRemovedHandler);
-			m_pKeyboard->RegisterKeyPressedHandler (KeyPressedHandler);
-			m_Logger.Write (FromCore0, LogNotice, "USB keyboard attached");
-		}
-	}
-
-	if (m_pMouse == 0)
-	{
-		m_pMouse = (CMouseDevice *) m_DeviceNameService.GetDevice ("mouse1", FALSE);
-		if (m_pMouse != 0)
-		{
-			m_pMouse->RegisterRemovedHandler (MouseRemovedHandler);
-			if (m_pMouse->Setup (m_Screen.GetFrameBuffer ()))
-			{
-				m_pMouse->SetCursor (m_Screen.GetWidth () / 2, m_Screen.GetHeight () / 2);
-				m_pMouse->ShowCursor (TRUE);
-				m_pMouse->RegisterEventHandler (MouseEventHandler);
-			}
-			m_Logger.Write (FromCore0, LogNotice, "USB mouse attached");
-		}
-	}
-}
-
-void CCore0::KeyPressedHandler (const char *pString)
-{
-	assert (s_pThis != 0);
-	s_pThis->m_Screen.Write (pString, strlen (pString));
-}
-
-void CCore0::KeyboardRemovedHandler (CDevice *, void *)
-{
-	assert (s_pThis != 0);
-	s_pThis->m_pKeyboard = 0;
-	CLogger::Get ()->Write (FromCore0, LogNotice, "USB keyboard removed");
-}
-
-void CCore0::MouseRemovedHandler (CDevice *, void *)
-{
-	assert (s_pThis != 0);
-	s_pThis->m_pMouse = 0;
-	CLogger::Get ()->Write (FromCore0, LogNotice, "USB mouse removed");
-}
-
-void CCore0::MouseEventHandler (TMouseEvent, unsigned, unsigned, unsigned, int)
-{
-	// The CMouseDevice draws and updates its framebuffer cursor itself.
 }

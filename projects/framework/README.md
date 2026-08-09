@@ -119,8 +119,9 @@ core-to-core helper stamps it automatically.
 
 Direct routing coexists with event-type subscriptions. `EventType::Count`
 marks the end of the event enumeration, and `EventBit()` maps each event type
-to one bit in the 32-bit `EventMask`. `None` and `Count` cannot be subscribed
-to or published.
+to one bit in the 64-bit `EventMask`. `None` and `Count` cannot be subscribed
+to or published. Because `None` reserves bit 0, the mask supports up to 63
+subscribable event types.
 
 A core subscribes and publishes through protected `CCore` methods:
 
@@ -173,6 +174,81 @@ scheduler loop.
 
 The virtual `CCore::HandleEvent()` method is the extension point each subclass
 implements to add core-specific behavior for each event type.
+
+## Service executor
+
+`CService` and `CExecutor` provide a standalone foundation for future
+core-local services. `CExecutor` is compiled into the framework but is not yet
+connected to `CCore`.
+
+A service implements:
+
+- `InitService()` for startup work after hardware dependencies are ready;
+- `Update()` for polling and housekeeping;
+- `OnEvent(const Event&)` for event handling.
+
+The base `InitService()` returns `TRUE`, so services without startup work do not
+have to override it. Constructors should only store dependencies and initialize
+local state; hardware access belongs in `Initialize()` or later methods.
+
+Each service contains `m_timeout`, an absolute deadline in Circle's continuous
+1 MHz clock ticks, and `m_periodMS`, its update period in milliseconds. The
+period is passed to the `CService` constructor. After calling `Update()`, the
+executor automatically calls `ResetTimer()` to schedule the next deadline.
+Pass `CService::PeriodPolling` to call `Update()` on every executor pass, or
+`CService::PeriodDisabled` for an event-only service. These sentinels have the
+values `0` and `UINT32_MAX`, respectively; other values are periods in
+milliseconds.
+
+After all services are registered, `CExecutor::Initialize()` initializes them
+in registration order and starts their timers. Registration is rejected after
+successful executor initialization, and `Run()` requires initialization first.
+If any service fails, executor initialization returns `FALSE` and does not
+start the run loop.
+
+An executor is constructed with an event queue and accepts up to 64 service
+registrations. Its hard `Run()` loop first calls `Update()` on every service
+whose deadline has expired. It then pops at most one event and passes that
+event to every registered service's `OnEvent()` method. Services are
+responsible for ignoring event types that do not interest them. Processing one
+event per pass ensures timeout checks occur between queued events.
+
+`CKeyboardService` is the first extracted service. It owns USB keyboard
+discovery and attachment state, keyboard removal and keypress callbacks, LED
+updates, logging, and key output to the screen. Core 0 owns this service and
+calls its `InitService()` after USB initialization for initial discovery, then
+calls its polling `Update()` directly from the existing loop for hot-plug and
+LED maintenance. Event executor registration will be introduced in a later
+refactor; its `OnEvent()` is therefore currently a no-op.
+
+`CMouseService` follows the same lifecycle. It owns USB mouse discovery and
+attachment state, framebuffer cursor setup and centering, removal and mouse
+callbacks, cursor updates, and logging. Core 0 initializes it after USB and
+calls its polling `Update()` from the existing loop. Its `OnEvent()` is also a
+no-op until executor registration is introduced.
+
+`CUSBHostService` owns `CUSBHCIDevice`, initializes the USB host controller,
+and performs task-level plug-and-play polling from `Update()`. Core 0
+initializes and updates this service before the keyboard and mouse services so
+new devices enter Circle's device-name registry before those services search
+for them.
+
+`CScreenService` owns and initializes `CScreenDevice`. It is event-only and
+requires no periodic update. Core 0 uses its screen accessor for logger output
+fallback and injects the same screen device into the keyboard, mouse, and web
+server services.
+
+`CNetworkService` owns `CNetSubSystem`, initializes the TCP/IP stack, polls for
+the DHCP-bound running state, and logs the assigned WLAN address once it is
+available. Core 0 initializes it after the WLAN device and calls its polling
+`Update()` from the existing loop. The service exposes the network subsystem
+to dependent services; WPA supplicant ownership remains in core 0 for now.
+
+`CWebServerService` depends on `CNetworkService`, the timer, the screen, and the
+configured SD-card web root. It waits until the network is running, creates the
+process-lifetime `CSDWebServer` scheduler task once, and logs the listening
+port and document root. Core 0 initializes it after WPA supplicant and calls
+its polling `Update()` from the existing loop.
 
 ## SD-card files
 
