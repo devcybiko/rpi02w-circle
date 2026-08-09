@@ -1,6 +1,7 @@
 #include "webserver.h"
 
 #include <fatfs/ff.h>
+#include <circle/logger.h>
 #include <circle/memory.h>
 #include <circle/screen.h>
 #include <circle/string.h>
@@ -152,6 +153,9 @@ THTTPStatus CSDWebServer::GetAction (const char *pPayload, u8 *pBuffer,
 		return HTTPBadRequest;
 	}
 
+	// write the action payload to the logger
+	static const char FromWebServer[] = "webserver";
+	CLogger::Get ()->Write (FromWebServer, LogNotice, "action payload: %s", pPayload != 0 ? pPayload : "<null>");
 	static const char Response[] = "{\"accepted\":true}\n";
 	if (sizeof Response - 1 > *pLength)
 	{
