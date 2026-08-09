@@ -1,0 +1,2 @@
+bootfs/*
+!bootfs/config.txt
