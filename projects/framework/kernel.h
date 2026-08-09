@@ -5,6 +5,7 @@
 #include "core1.h"
 #include "core2.h"
 #include "core3.h"
+#include "eventrouter.h"
 
 #include <circle/multicore.h>
 #include <circle/types.h>
@@ -25,11 +26,15 @@ public:
 	boolean Initialize (void);
 	TShutdownMode Run (void);
 	boolean QueueEvent (unsigned nCore, const Event &EventToQueue);
+	boolean Subscribe (unsigned nCore, EventType Type);
+	boolean Unsubscribe (unsigned nCore, EventType Type);
+	u32 PublishEvent (const Event &EventToPublish);
 
 protected:
 	void Run (unsigned nCore) override;
 
 private:
+	CEventRouter m_EventRouter;
 	CCore0 m_Core0;
 	CCore1 m_Core1;
 	CCore2 m_Core2;

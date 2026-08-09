@@ -19,8 +19,8 @@ path dispatches core 0 through that same function.
 
 All CPU-specific classes derive from the common `CCore` base in `core.h` and
 `core.cpp`. The base owns the per-core event queue, records the destination
-core number, sends wakeup IPIs after enqueueing, and provides the standard
-event-consumer loop used by the secondary cores.
+core number, provides cross-core event sending through the router, and
+implements the standard event-consumer loop used by the secondary cores.
 
 Each CPU core then has its own subclass:
 
@@ -38,6 +38,25 @@ The relevant files are `kernel.cpp`, `core0.cpp`, `core1.cpp`, `core2.cpp`, and
 Every core owns a bounded multiple-producer, single-consumer event queue. Any
 core or interrupt handler can produce an event, but only the destination core
 removes events from its queue.
+
+`CKernel` owns one `CEventRouter` and constructs it before the four core
+objects. Each core registers its queue pointer and wakeup policy with that
+router from the `CCore` base constructor. The router is therefore shared by
+reference but is not global. It maps a destination core number to a queue
+endpoint and maintains an `EventMask` subscription bitmap for each core.
+
+All producer-side operations belong to `CEventRouter::QueueEvent()`: it finds
+the destination endpoint, pushes a copy into that queue, and sends an IPI when
+the endpoint requires one. A sender never calls a method on the destination
+`CCore`. The destination core only performs consumer-side operations by
+popping its own queue and dispatching `HandleEvent()`.
+
+The `CCore` constructor also receives a `bNeedsWakeUp` policy flag. Queueing an
+event sends an IPI only when that destination has enabled the flag. Core 0 sets
+it to `FALSE` because its scheduler loop polls the queue; cores 1 through 3 set
+it to `TRUE` because their default loops sleep in `wfi`. A future core-specific
+loop that does not sleep can disable wakeups without adding special handling
+for its core number to the router.
 
 The queues have these properties:
 
@@ -73,11 +92,84 @@ if (!Kernel.QueueEvent (2, EventToSend))
 }
 ```
 
-After a successful enqueue to cores 1 through 3, the destination core receives
-a user inter-processor interrupt. This wakes its `wfi` wait loop. The consumer
-checks its queue with interrupts temporarily masked so an event cannot be lost
-between the empty check and entering the wait state. Core 0 checks its queue as
-part of its existing scheduler loop.
+Code running in a `CCore` subclass sends directly to another core through the
+protected base method `SendEventToCore()`. It automatically replaces the
+event's `sourceCore` with the sending core number:
+
+```cpp
+void CCore1::HandleEvent (const Event &)
+{
+	Event Reply {};
+	Reply.type = EventType::Status;
+	Reply.status.code = 2;
+	Reply.status.value = 100;
+
+	if (!SendEventToCore (3, Reply))
+	{
+		// Core 3's queue is full or the destination is invalid.
+	}
+}
+```
+
+Both routing APIs return `FALSE` for an invalid destination or a full queue.
+`CKernel::QueueEvent()` preserves the supplied `sourceCore`; only the
+core-to-core helper stamps it automatically.
+
+### Publish and subscribe
+
+Direct routing coexists with event-type subscriptions. `EventType::Count`
+marks the end of the event enumeration, and `EventBit()` maps each event type
+to one bit in the 32-bit `EventMask`. `None` and `Count` cannot be subscribed
+to or published.
+
+A core subscribes and publishes through protected `CCore` methods:
+
+```cpp
+CCore2::CCore2 (CEventRouter *pEventRouter)
+: CCore (pEventRouter, 2, TRUE)
+{
+	Subscribe (EventType::GPIO);
+	Subscribe (EventType::Status);
+}
+
+void CCore2::HandleEvent (const Event &EventToHandle)
+{
+	if (EventToHandle.type == EventType::GPIO)
+	{
+		Event Status {};
+		Status.type = EventType::Status;
+		Status.status.code = EventToHandle.gpio.pin;
+		Status.status.value = EventToHandle.gpio.value;
+
+		u32 DeliveredTo = PublishEvent (Status);
+		(void) DeliveredTo;
+	}
+}
+```
+
+`PublishEvent()` stamps the publisher's core number into `sourceCore`, skips
+the publishing core, and copies the event into every other queue subscribed to
+that type. Its return value is a core bitmap: bit 0 represents core 0, bit 1
+represents core 1, and so on. A bit is set only when that destination accepted
+the event, so a full queue appears as a missing bit.
+
+Subscriptions can be removed with `Unsubscribe(EventType)`. Kernel-level code
+can use `CKernel::Subscribe(core, type)`, `CKernel::Unsubscribe(core, type)`,
+and `CKernel::PublishEvent(event)`. The kernel-level publish operation uses the
+event's existing `sourceCore` field.
+
+Subscription changes are protected by the router's IRQ-safe spinlock. Publish
+takes a snapshot of matching recipients under that lock, releases it, and only
+then writes to their queues. This avoids holding the router lock while queue
+locks and wakeup IPIs are used.
+
+All four cores have queues and can receive direct or published events. After a
+successful enqueue to a core whose `bNeedsWakeUp` policy is enabled, that core
+receives a user inter-processor interrupt to wake its `wfi` wait loop. A
+sleeping consumer checks its queue with interrupts temporarily masked so an
+event cannot be lost between the empty check and entering the wait state. Core
+0 disables the policy because it checks its queue as part of its existing
+scheduler loop.
 
 The virtual `CCore::HandleEvent()` method is the extension point each subclass
 implements to add core-specific behavior for each event type.

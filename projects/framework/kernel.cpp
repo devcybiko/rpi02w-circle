@@ -3,7 +3,11 @@
 #include <circle/memory.h>
 
 CKernel::CKernel (void)
-: CMultiCoreSupport (CMemorySystem::Get ())
+: CMultiCoreSupport (CMemorySystem::Get ()),
+  m_Core0 (&m_EventRouter),
+  m_Core1 (&m_EventRouter),
+  m_Core2 (&m_EventRouter),
+  m_Core3 (&m_EventRouter)
 {
 }
 
@@ -31,23 +35,22 @@ TShutdownMode CKernel::Run (void)
 
 boolean CKernel::QueueEvent (unsigned nCore, const Event &EventToQueue)
 {
-	switch (nCore)
-	{
-	case 0:
-		return m_Core0.QueueEvent (EventToQueue);
+	return m_EventRouter.QueueEvent (nCore, EventToQueue);
+}
 
-	case 1:
-		return m_Core1.QueueEvent (EventToQueue);
+boolean CKernel::Subscribe (unsigned nCore, EventType Type)
+{
+	return m_EventRouter.Subscribe (nCore, Type);
+}
 
-	case 2:
-		return m_Core2.QueueEvent (EventToQueue);
+boolean CKernel::Unsubscribe (unsigned nCore, EventType Type)
+{
+	return m_EventRouter.Unsubscribe (nCore, Type);
+}
 
-	case 3:
-		return m_Core3.QueueEvent (EventToQueue);
-
-	default:
-		return FALSE;
-	}
+u32 CKernel::PublishEvent (const Event &EventToPublish)
+{
+	return m_EventRouter.Publish (EventToPublish.sourceCore, EventToPublish);
 }
 
 void CKernel::Run (unsigned nCore)

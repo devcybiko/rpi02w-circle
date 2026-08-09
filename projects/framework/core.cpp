@@ -1,11 +1,15 @@
 #include "core.h"
+#include "eventrouter.h"
 
-#include <circle/multicore.h>
 #include <circle/synchronize.h>
+#include <assert.h>
 
-CCore::CCore (unsigned nCore)
-: m_nCore (nCore)
+CCore::CCore (CEventRouter *pEventRouter, unsigned nCore, boolean bNeedsWakeUp)
+: m_pEventRouter (pEventRouter),
+  m_nCore (nCore)
 {
+	assert (m_pEventRouter != 0);
+	m_pEventRouter->RegisterCore (m_nCore, &m_EventQueue, bNeedsWakeUp);
 }
 
 CCore::~CCore (void)
@@ -35,19 +39,27 @@ void CCore::Run (void)
 	}
 }
 
-boolean CCore::QueueEvent (const Event &EventToQueue)
+boolean CCore::SendEventToCore (unsigned nCore, const Event &EventToSend)
 {
-	if (!m_EventQueue.Push (EventToQueue))
-	{
-		return FALSE;
-	}
+	Event RoutedEvent = EventToSend;
+	RoutedEvent.sourceCore = static_cast<u8> (m_nCore);
 
-	if (m_nCore != 0)
-	{
-		CMultiCoreSupport::SendIPI (m_nCore, IPI_USER);
-	}
+	return m_pEventRouter->QueueEvent (nCore, RoutedEvent);
+}
 
-	return TRUE;
+boolean CCore::Subscribe (EventType Type)
+{
+	return m_pEventRouter->Subscribe (m_nCore, Type);
+}
+
+boolean CCore::Unsubscribe (EventType Type)
+{
+	return m_pEventRouter->Unsubscribe (m_nCore, Type);
+}
+
+u32 CCore::PublishEvent (const Event &EventToPublish)
+{
+	return m_pEventRouter->Publish (m_nCore, EventToPublish);
 }
 
 void CCore::ProcessEvents (void)

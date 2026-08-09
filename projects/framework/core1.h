@@ -6,7 +6,7 @@
 class CCore1 : public CCore
 {
 public:
-	CCore1 (void);
+	explicit CCore1 (CEventRouter *pEventRouter);
 
 protected:
 	void HandleEvent (const Event &EventToHandle) override;

@@ -111,7 +111,7 @@ kernel.o kernel.d: kernel.cpp kernel.h core0.h core.h eventqueue.h \
  ../../circle/include/circle/net/netconnection.h \
  ../../circle/include/circle/net/checksumcalculator.h \
  ../../circle/include/circle/net/tcprejector.h core1.h core2.h core3.h \
- ../../circle/include/circle/multicore.h \
+ eventrouter.h ../../circle/include/circle/multicore.h \
  ../../circle/include/circle/memory.h \
  ../../circle/include/circle/pagetable.h \
  ../../circle/include/circle/heapallocator.h \

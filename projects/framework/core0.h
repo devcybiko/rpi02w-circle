@@ -26,7 +26,7 @@
 class CCore0 : public CCore
 {
 public:
-	CCore0 (void);
+	explicit CCore0 (CEventRouter *pEventRouter);
 	~CCore0 (void);
 
 	boolean Initialize (void);

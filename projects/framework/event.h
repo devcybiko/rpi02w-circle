@@ -9,8 +9,19 @@ enum class EventType : u16
 	Mouse,
 	GPIO,
 	Network,
-	Status
+	Status,
+	Count
 };
+
+using EventMask = u32;
+
+constexpr EventMask EventBit (EventType Type)
+{
+	return static_cast<EventMask> (1U) << static_cast<unsigned> (Type);
+}
+
+static_assert (static_cast<unsigned> (EventType::Count) <= sizeof (EventMask) * 8,
+	      "EventMask is too small for EventType");
 
 struct KeyEvent
 {

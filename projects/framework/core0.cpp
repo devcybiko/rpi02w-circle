@@ -14,8 +14,8 @@ static const char FromCore0[] = "core0";
 
 CCore0 *CCore0::s_pThis = 0;
 
-CCore0::CCore0 (void)
-: CCore (0),
+CCore0::CCore0 (CEventRouter *pEventRouter)
+: CCore (pEventRouter, 0, FALSE),
   m_Screen (m_Options.GetWidth (), m_Options.GetHeight ()),
   m_Timer (&m_Interrupt),
   m_Logger (m_Options.GetLogLevel (), &m_Timer),
