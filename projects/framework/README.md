@@ -21,18 +21,18 @@ firmware preparation details and supported filenames are in
 
 The server starts after WLAN has received an IP address and listens on port 80.
 It serves static files from `SD:/www`, which is the `/www` directory at the
-root of the boot SD card. The bundled site lives in this project's `web/`
+root of the boot SD card. The bundled site lives in this project's `www/`
 directory; its contents must be copied to the card as follows:
 
 ```text
-projects/framework/web/index.html  ->  SD:/www/index.html
-projects/framework/web/css/...     ->  SD:/www/css/...
-projects/framework/web/js/...      ->  SD:/www/js/...
+projects/framework/www/index.html  ->  SD:/www/index.html
+projects/framework/www/css/...     ->  SD:/www/css/...
+projects/framework/www/js/...      ->  SD:/www/js/...
 ```
 
 The Docker deployment script copies this directory automatically. For a manual
-SD-card deployment, copy the *contents* of `web/` into `/www/`, not the
-directory itself into `/www/web/`.
+SD-card deployment, copy the *contents* of `www/` into `/www/`, not the
+directory itself into `/www/www/`.
 
 ### Static routes
 

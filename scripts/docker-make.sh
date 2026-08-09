@@ -12,6 +12,6 @@ docker exec -it circle-dev sh -c '
 '
 cp projects/framework/kernel8-32.img /Volumes/CIRCLE/kernel8-32.img
 mkdir -p /Volumes/CIRCLE/www
-cp -R projects/framework/web/. /Volumes/CIRCLE/www/
+cp -R projects/framework/www/. /Volumes/CIRCLE/www/
 sync
 diskutil eject /dev/disk5
