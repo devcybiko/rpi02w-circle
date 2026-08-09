@@ -238,6 +238,26 @@ requires no periodic update. Core 0 uses its screen accessor for logger output
 fallback and injects the same screen device into the keyboard, mouse, and web
 server services.
 
+`CSerialService` owns the Raspberry Pi hardware UART and initializes it at the
+configured baud rate, currently 115200. It is event-only and is initialized
+after the screen but before the logger resolves its configured output device,
+preserving serial logging during the rest of startup.
+
+`CLoggerService` owns `CLogger`, resolves the configured logging device through
+Circle's device-name registry, and falls back to the screen when that device is
+unavailable. It is event-only and is initialized after screen and serial.
+Circle's global `CLogger::Get()` access remains available to all other services.
+
+`CStorageService` owns `CEMMCDevice` and the FATFS mount object. It initializes
+the SD/eMMC controller, mounts the configured `SD:` drive, and reports mount
+failures through the logger. It is event-only and is initialized before WLAN
+so firmware and configuration files are available from the SD card.
+
+`CWLANService` owns `CBcm4343Device` and its firmware path. It is event-only
+and initializes the onboard WLAN hardware after storage is mounted. Network
+and WPA initialization remain separate so startup preserves the required
+`Storage → WLAN → Network → WPA` order.
+
 `CNetworkService` owns `CNetSubSystem`, initializes the TCP/IP stack, polls for
 the DHCP-bound running state, and logs the assigned WLAN address once it is
 available. Core 0 initializes it after the WLAN device and calls its polling

@@ -51,7 +51,7 @@ kernel.o kernel.d: kernel.cpp kernel.h core0.h core.h eventqueue.h \
  ../../circle/include/circle/usb/usbcontroller.h \
  ../../circle/include/circle/input/keyboardbehaviour.h \
  ../../circle/include/circle/input/keymap.h \
- ../../circle/include/circle/usb/usbhid.h mouseservice.h \
+ ../../circle/include/circle/usb/usbhid.h loggerservice.h mouseservice.h \
  ../../circle/include/circle/input/mouse.h \
  ../../circle/include/circle/input/mousebehaviour.h networkservice.h \
  ../../circle/include/circle/net/netsubsystem.h \
@@ -77,6 +77,16 @@ kernel.o kernel.d: kernel.cpp kernel.h core0.h core.h eventqueue.h \
  ../../circle/include/circle/net/netconnection.h \
  ../../circle/include/circle/net/checksumcalculator.h \
  ../../circle/include/circle/net/tcprejector.h screenservice.h \
+ serialservice.h ../../circle/include/circle/serial.h storageservice.h \
+ ../../circle/addon/SDCard/emmc.h ../../circle/include/circle/actled.h \
+ ../../circle/include/circle/virtualgpiopin.h \
+ ../../circle/include/circle/fs/partitionmanager.h \
+ ../../circle/include/circle/fs/partition.h \
+ ../../circle/addon/SDCard/sdhost.h ../../circle/addon/SDCard/mmchost.h \
+ ../../circle/addon/SDCard/mmc.h ../../circle/include/circle/memio.h \
+ ../../circle/addon/fatfs/ff.h ../../circle/addon/fatfs/ffconf.h \
+ /opt/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/15.2.1/include/stdint.h \
+ /opt/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/15.2.1/include/stdint-gcc.h \
  usbhostservice.h ../../circle/include/circle/usb/usbhcidevice.h \
  ../../circle/include/circle/usb/dwhcidevice.h \
  ../../circle/include/circle/usb/dwhcirootport.h \
@@ -97,24 +107,13 @@ kernel.o kernel.d: kernel.cpp kernel.h core0.h core.h eventqueue.h \
  ../../circle/include/circle/net/http.h \
  ../../circle/include/circle/net/socket.h \
  ../../circle/include/circle/net/netsocket.h \
- ../../circle/include/circle/net/error.h \
- ../../circle/include/circle/actled.h \
- ../../circle/include/circle/virtualgpiopin.h \
+ ../../circle/include/circle/net/error.h wlanservice.h \
+ ../../circle/addon/wlan/bcm4343.h ../../circle/addon/wlan/etherevent.h \
  ../../circle/include/circle/koptions.h \
  ../../circle/include/circle/cputhrottle.h \
- ../../circle/include/circle/serial.h \
  ../../circle/include/circle/exceptionhandler.h \
  ../../circle/include/circle/exception.h \
  ../../circle/include/circle/sched/scheduler.h \
- ../../circle/addon/SDCard/emmc.h \
- ../../circle/include/circle/fs/partitionmanager.h \
- ../../circle/include/circle/fs/partition.h \
- ../../circle/addon/SDCard/sdhost.h ../../circle/addon/SDCard/mmchost.h \
- ../../circle/addon/SDCard/mmc.h ../../circle/include/circle/memio.h \
- ../../circle/addon/fatfs/ff.h ../../circle/addon/fatfs/ffconf.h \
- /opt/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/15.2.1/include/stdint.h \
- /opt/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/15.2.1/include/stdint-gcc.h \
- ../../circle/addon/wlan/bcm4343.h ../../circle/addon/wlan/etherevent.h \
  ../../circle/addon/wlan/hostap/wpa_supplicant/wpasupplicant.h core1.h \
  core2.h core3.h eventrouter.h ../../circle/include/circle/multicore.h \
  ../../circle/include/circle/memory.h \

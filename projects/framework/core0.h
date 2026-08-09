@@ -3,24 +3,23 @@
 
 #include "core.h"
 #include "keyboardservice.h"
+#include "loggerservice.h"
 #include "mouseservice.h"
 #include "networkservice.h"
 #include "screenservice.h"
+#include "serialservice.h"
+#include "storageservice.h"
 #include "usbhostservice.h"
 #include "webserverservice.h"
+#include "wlanservice.h"
 
 #include <circle/actled.h>
 #include <circle/koptions.h>
 #include <circle/devicenameservice.h>
-#include <circle/serial.h>
 #include <circle/exceptionhandler.h>
 #include <circle/interrupt.h>
 #include <circle/timer.h>
-#include <circle/logger.h>
 #include <circle/sched/scheduler.h>
-#include <SDCard/emmc.h>
-#include <fatfs/ff.h>
-#include <wlan/bcm4343.h>
 #include <wlan/hostap/wpa_supplicant/wpasupplicant.h>
 #include <circle/types.h>
 
@@ -42,16 +41,15 @@ private:
 	CKernelOptions		m_Options;
 	CDeviceNameService	m_DeviceNameService;
 	CScreenService		m_ScreenService;
-	CSerialDevice		m_Serial;
+	CSerialService		m_SerialService;
 	CExceptionHandler	m_ExceptionHandler;
 	CInterruptSystem	m_Interrupt;
 	CTimer			m_Timer;
-	CLogger			m_Logger;
+	CLoggerService		m_LoggerService;
 	CScheduler		m_Scheduler;
 	CUSBHostService		m_USBHostService;
-	CEMMCDevice		m_EMMC;
-	FATFS			m_FileSystem;
-	CBcm4343Device		m_WLAN;
+	CStorageService		m_StorageService;
+	CWLANService		m_WLANService;
 	CNetworkService		m_NetworkService;
 	CWPASupplicant		m_WPASupplicant;
 	CKeyboardService	m_KeyboardService;
