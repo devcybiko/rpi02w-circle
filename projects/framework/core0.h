@@ -2,16 +2,12 @@
 #define _framework_core0_h
 
 #include "core.h"
-#include "keyboardservice.h"
+#include "hidservice.h"
 #include "loggerservice.h"
-#include "mouseservice.h"
-#include "networkservice.h"
 #include "screenservice.h"
 #include "serialservice.h"
 #include "storageservice.h"
-#include "usbhostservice.h"
 #include "webserverservice.h"
-#include "wlanservice.h"
 
 #include <circle/actled.h>
 #include <circle/koptions.h>
@@ -20,7 +16,6 @@
 #include <circle/interrupt.h>
 #include <circle/timer.h>
 #include <circle/sched/scheduler.h>
-#include <wlan/hostap/wpa_supplicant/wpasupplicant.h>
 #include <circle/types.h>
 
 class CCore0 : public CCore
@@ -47,13 +42,8 @@ private:
 	CTimer			m_Timer;
 	CLoggerService		m_LoggerService;
 	CScheduler		m_Scheduler;
-	CUSBHostService		m_USBHostService;
+	CHIDService		m_HIDService;
 	CStorageService		m_StorageService;
-	CWLANService		m_WLANService;
-	CNetworkService		m_NetworkService;
-	CWPASupplicant		m_WPASupplicant;
-	CKeyboardService	m_KeyboardService;
-	CMouseService		m_MouseService;
 	CWebServerService	m_WebServerService;
 };
 

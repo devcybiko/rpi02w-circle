@@ -1,21 +1,28 @@
 #include "webserverservice.h"
 
 #include <circle/logger.h>
+#include <circle/string.h>
 #include <assert.h>
 
 static const char FromWebServerService[] = "webserver";
 
-CWebServerService::CWebServerService (CNetworkService *pNetworkService,
-				      CTimer *pTimer, CScreenDevice *pScreen,
-				      const char *pWebRoot)
+CWebServerService::CWebServerService (const char *pFirmwarePath,
+				      const char *pConfigFile, CTimer *pTimer,
+				      CScreenDevice *pScreen, const char *pWebRoot)
 : CService (PeriodPolling),
-  m_pNetworkService (pNetworkService),
+  m_pFirmwarePath (pFirmwarePath),
+  m_pConfigFile (pConfigFile),
   m_pTimer (pTimer),
   m_pScreen (pScreen),
   m_pWebRoot (pWebRoot),
+  m_WLAN (pFirmwarePath),
+  m_Net (0, 0, 0, 0, DEFAULT_HOSTNAME, NetDeviceTypeWLAN),
+  m_WPASupplicant (pConfigFile),
+  m_bReportedNetwork (FALSE),
   m_pWebServer (0)
 {
-	assert (m_pNetworkService != 0);
+	assert (m_pFirmwarePath != 0);
+	assert (m_pConfigFile != 0);
 	assert (m_pTimer != 0);
 	assert (m_pScreen != 0);
 	assert (m_pWebRoot != 0);
@@ -29,24 +36,55 @@ CWebServerService::~CWebServerService (void)
 	m_pWebRoot = 0;
 	m_pScreen = 0;
 	m_pTimer = 0;
-	m_pNetworkService = 0;
+	m_pConfigFile = 0;
+	m_pFirmwarePath = 0;
 }
 
 boolean CWebServerService::InitService (void)
 {
+	if (!m_WLAN.Initialize ())
+	{
+		return FALSE;
+	}
+
+	if (!m_Net.Initialize (FALSE))
+	{
+		return FALSE;
+	}
+
+	if (!m_WPASupplicant.Initialize ())
+	{
+		return FALSE;
+	}
+
+	m_bReportedNetwork = FALSE;
 	m_pWebServer = 0;
 	return TRUE;
 }
 
 void CWebServerService::Update (void)
 {
-	if (m_pWebServer != 0 || !m_pNetworkService->IsRunning ())
+	if (!m_Net.IsRunning ())
 	{
 		return;
 	}
 
-	m_pWebServer = new CSDWebServer (m_pNetworkService->GetNetSubSystem (),
-					m_pWebRoot, m_pTimer, m_pScreen);
+	if (!m_bReportedNetwork)
+	{
+		CString IPAddress;
+		m_Net.GetConfig ()->GetIPAddress ()->Format (&IPAddress);
+		CLogger::Get ()->Write (FromWebServerService, LogNotice,
+				       "WLAN connected: %s",
+				       static_cast<const char *> (IPAddress));
+		m_bReportedNetwork = TRUE;
+	}
+
+	if (m_pWebServer != 0)
+	{
+		return;
+	}
+
+	m_pWebServer = new CSDWebServer (&m_Net, m_pWebRoot, m_pTimer, m_pScreen);
 	assert (m_pWebServer != 0);
 
 	CLogger::Get ()->Write (FromWebServerService, LogNotice,

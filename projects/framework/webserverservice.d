@@ -1,12 +1,18 @@
 webserverservice.o webserverservice.d: webserverservice.cpp \
- webserverservice.h networkservice.h service.h event.h \
- ../../circle/include/circle/types.h ../../circle/include/assert.h \
- ../../circle/include/circle/macros.h \
+ webserverservice.h service.h event.h ../../circle/include/circle/types.h \
+ ../../circle/include/assert.h ../../circle/include/circle/macros.h \
+ webserver.h ../../circle/include/circle/net/httpdaemon.h \
+ ../../circle/include/circle/sched/task.h \
+ ../../circle/include/circle/sched/taskswitch.h \
+ ../../circle/include/circle/sched/synchronizationevent.h \
+ ../../circle/include/circle/sysconfig.h \
+ ../../circle/include/circle/memorymap.h \
+ ../../circle/include/circle/startup.h \
+ ../../circle/include/circle/string.h \
+ ../../circle/include/circle/stdarg.h \
  ../../circle/include/circle/net/netsubsystem.h \
  ../../circle/include/circle/net/netconfig.h \
  ../../circle/include/circle/net/ipaddress.h \
- ../../circle/include/circle/string.h \
- ../../circle/include/circle/stdarg.h \
  ../../circle/include/circle/net/netdevlayer.h \
  ../../circle/include/circle/netdevice.h \
  ../../circle/include/circle/macaddress.h \
@@ -14,8 +20,6 @@ webserverservice.o webserverservice.d: webserverservice.cpp \
  ../../circle/include/circle/synchronize.h \
  ../../circle/include/circle/net/netbufferqueue.h \
  ../../circle/include/circle/spinlock.h \
- ../../circle/include/circle/sysconfig.h \
- ../../circle/include/circle/memorymap.h \
  ../../circle/include/circle/bcm54213.h \
  ../../circle/include/circle/timer.h \
  ../../circle/include/circle/interrupt.h \
@@ -36,12 +40,7 @@ webserverservice.o webserverservice.d: webserverservice.cpp \
  ../../circle/include/circle/net/netconnection.h \
  ../../circle/include/circle/net/checksumcalculator.h \
  ../../circle/include/circle/net/tcprejector.h \
- ../../circle/include/circle/device.h webserver.h \
- ../../circle/include/circle/net/httpdaemon.h \
- ../../circle/include/circle/sched/task.h \
- ../../circle/include/circle/sched/taskswitch.h \
- ../../circle/include/circle/sched/synchronizationevent.h \
- ../../circle/include/circle/startup.h \
+ ../../circle/include/circle/device.h \
  ../../circle/include/circle/net/http.h \
  ../../circle/include/circle/net/socket.h \
  ../../circle/include/circle/net/netsocket.h \
@@ -58,5 +57,7 @@ webserverservice.o webserverservice.d: webserverservice.cpp \
  ../../circle/include/circle/devicetreeblob.h \
  ../../circle/include/circle/terminal.h \
  ../../circle/include/circle/chargenerator.h \
- ../../circle/include/circle/font.h ../../circle/include/circle/logger.h \
- ../../circle/include/circle/time.h
+ ../../circle/include/circle/font.h ../../circle/addon/wlan/bcm4343.h \
+ ../../circle/addon/wlan/etherevent.h \
+ ../../circle/addon/wlan/hostap/wpa_supplicant/wpasupplicant.h \
+ ../../circle/include/circle/logger.h ../../circle/include/circle/time.h

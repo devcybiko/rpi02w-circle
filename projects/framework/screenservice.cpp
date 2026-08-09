@@ -2,7 +2,7 @@
 
 CScreenService::CScreenService (unsigned nWidth, unsigned nHeight)
 : CService (PeriodDisabled),
-  m_Screen (nWidth, nHeight)
+  m_Screen (nWidth, nHeight, Font12x22)
 {
 }
 

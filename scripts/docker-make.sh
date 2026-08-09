@@ -23,6 +23,8 @@ docker exec -it circle-dev sh -c '
 '
 if [[ -d /Volumes/CIRCLE ]]; then
 	cp projects/framework/kernel8-32.img /Volumes/CIRCLE/kernel8-32.img
+	cp bootfs/config.txt /Volumes/CIRCLE/config.txt
+	rm -f /Volumes/CIRCLE/cmdline.txt
 	mkdir -p /Volumes/CIRCLE/www
 	cp -R projects/framework/www/. /Volumes/CIRCLE/www/
 	sync

@@ -213,30 +213,18 @@ event to every registered service's `OnEvent()` method. Services are
 responsible for ignoring event types that do not interest them. Processing one
 event per pass ensures timeout checks occur between queued events.
 
-`CKeyboardService` is the first extracted service. It owns USB keyboard
-discovery and attachment state, keyboard removal and keypress callbacks, LED
-updates, logging, and key output to the screen. Core 0 owns this service and
-calls its `InitService()` after USB initialization for initial discovery, then
-calls its polling `Update()` directly from the existing loop for hot-plug and
-LED maintenance. Event executor registration will be introduced in a later
-refactor; its `OnEvent()` is therefore currently a no-op.
-
-`CMouseService` follows the same lifecycle. It owns USB mouse discovery and
-attachment state, framebuffer cursor setup and centering, removal and mouse
-callbacks, cursor updates, and logging. Core 0 initializes it after USB and
-calls its polling `Update()` from the existing loop. Its `OnEvent()` is also a
-no-op until executor registration is introduced.
-
-`CUSBHostService` owns `CUSBHCIDevice`, initializes the USB host controller,
-and performs task-level plug-and-play polling from `Update()`. Core 0
-initializes and updates this service before the keyboard and mouse services so
-new devices enter Circle's device-name registry before those services search
-for them.
+`CHIDService` owns `CUSBHCIDevice` and all USB keyboard and mouse behavior. It
+initializes the USB host controller, performs task-level plug-and-play polling,
+discovers attached input devices, handles removal and input callbacks, updates
+keyboard LEDs and the mouse cursor, configures the framebuffer cursor, and
+logs attachment changes. Core 0 initializes it after the timer and calls its
+polling `Update()` from the existing loop. Its `OnEvent()` remains a no-op
+until executor registration is introduced.
 
 `CScreenService` owns and initializes `CScreenDevice`. It is event-only and
 requires no periodic update. Core 0 uses its screen accessor for logger output
-fallback and injects the same screen device into the keyboard, mouse, and web
-server services.
+fallback and injects the same screen device into the HID and web-server
+services.
 
 `CSerialService` owns the Raspberry Pi hardware UART and initializes it at the
 configured baud rate, currently 115200. It is event-only and is initialized
@@ -253,22 +241,13 @@ the SD/eMMC controller, mounts the configured `SD:` drive, and reports mount
 failures through the logger. It is event-only and is initialized before WLAN
 so firmware and configuration files are available from the SD card.
 
-`CWLANService` owns `CBcm4343Device` and its firmware path. It is event-only
-and initializes the onboard WLAN hardware after storage is mounted. Network
-and WPA initialization remain separate so startup preserves the required
-`Storage → WLAN → Network → WPA` order.
-
-`CNetworkService` owns `CNetSubSystem`, initializes the TCP/IP stack, polls for
-the DHCP-bound running state, and logs the assigned WLAN address once it is
-available. Core 0 initializes it after the WLAN device and calls its polling
-`Update()` from the existing loop. The service exposes the network subsystem
-to dependent services; WPA supplicant ownership remains in core 0 for now.
-
-`CWebServerService` depends on `CNetworkService`, the timer, the screen, and the
-configured SD-card web root. It waits until the network is running, creates the
-process-lifetime `CSDWebServer` scheduler task once, and logs the listening
-port and document root. Core 0 initializes it after WPA supplicant and calls
-its polling `Update()` from the existing loop.
+`CWebServerService` owns the complete WLAN-backed web stack: `CBcm4343Device`,
+`CNetSubSystem`, `CWPASupplicant`, and the process-lifetime `CSDWebServer`
+scheduler task. Its `InitService()` preserves the required
+`WLAN → Network → WPA` order after storage has mounted the firmware and
+configuration files. Its `Update()` waits for DHCP/network readiness, logs the
+assigned address, creates the web-server task once, and logs the listening port
+and document root. Core 0 calls `Update()` from its existing loop.
 
 ## SD-card files
 

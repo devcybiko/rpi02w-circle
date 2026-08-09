@@ -14,14 +14,10 @@ CCore0::CCore0 (CEventRouter *pEventRouter)
   m_Timer (&m_Interrupt),
   m_LoggerService (m_Options.GetLogLevel (), &m_Timer, &m_DeviceNameService,
 		   m_Options.GetLogDevice (), m_ScreenService.GetScreen ()),
-  m_USBHostService (&m_Interrupt, &m_Timer),
+  m_HIDService (&m_Interrupt, &m_Timer, &m_DeviceNameService,
+		m_ScreenService.GetScreen ()),
   m_StorageService (&m_Interrupt, &m_Timer, &m_ActLED, DRIVE),
-  m_WLANService (FIRMWARE_PATH),
-  m_NetworkService (),
-  m_WPASupplicant (CONFIG_FILE),
-  m_KeyboardService (&m_DeviceNameService, m_ScreenService.GetScreen ()),
-  m_MouseService (&m_DeviceNameService, m_ScreenService.GetScreen ()),
-  m_WebServerService (&m_NetworkService, &m_Timer,
+  m_WebServerService (FIRMWARE_PATH, CONFIG_FILE, &m_Timer,
 		      m_ScreenService.GetScreen (), WEB_ROOT)
 {
 	m_ActLED.Blink (5);
@@ -39,13 +35,8 @@ boolean CCore0::Initialize (void)
 	if (bOK) bOK = m_LoggerService.InitService ();
 	if (bOK) bOK = m_Interrupt.Initialize ();
 	if (bOK) bOK = m_Timer.Initialize ();
-	if (bOK) bOK = m_USBHostService.InitService ();
-	if (bOK) bOK = m_KeyboardService.InitService ();
-	if (bOK) bOK = m_MouseService.InitService ();
+	if (bOK) bOK = m_HIDService.InitService ();
 	if (bOK) bOK = m_StorageService.InitService ();
-	if (bOK) bOK = m_WLANService.InitService ();
-	if (bOK) bOK = m_NetworkService.InitService ();
-	if (bOK) bOK = m_WPASupplicant.Initialize ();
 	if (bOK) bOK = m_WebServerService.InitService ();
 
 	return bOK;
@@ -62,10 +53,7 @@ void CCore0::Run (void)
 	{
 		ProcessEvents ();
 
-		m_USBHostService.Update ();
-		m_KeyboardService.Update ();
-		m_MouseService.Update ();
-		m_NetworkService.Update ();
+		m_HIDService.Update ();
 		m_WebServerService.Update ();
 
 		m_Scheduler.MsSleep (10);
