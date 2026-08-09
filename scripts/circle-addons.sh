@@ -1,0 +1,1 @@
+git -C circle submodule update --init addon/wlan/hostap
