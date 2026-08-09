@@ -1,0 +1,6 @@
+country=US
+ctrl_interface=/var/run/wpa_supplicant
+network={
+	ssid="YOUR_NETWORK_NAME"
+	psk="YOUR_NETWORK_PASSWORD"
+}

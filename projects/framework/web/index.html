@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>RPi Zero 2 W Framework</title>
+
+<link
+    href="/css/bootstrap.min.css"
+    rel="stylesheet">
+
+    <style>
+        :root {
+            --rpi-green: #75c043;
+            --rpi-green-dark: #4e8f2d;
+            --panel-bg: rgba(255, 255, 255, 0.045);
+            --panel-border: rgba(255, 255, 255, 0.10);
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 15% 0%, rgba(117,192,67,.13), transparent 30rem),
+                radial-gradient(circle at 100% 100%, rgba(13,110,253,.09), transparent 35rem),
+                #0b0f14;
+        }
+
+        .navbar {
+            background: rgba(11, 15, 20, .90);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9px;
+            background: var(--rpi-green);
+            color: #071005;
+            font-weight: 800;
+            font-size: .9rem;
+        }
+
+        .hero {
+            padding: 6rem 0 3rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.75rem);
+            font-weight: 700;
+            letter-spacing: -.05em;
+        }
+
+        .hero .lead {
+            max-width: 700px;
+            color: #adb5bd;
+        }
+
+        .accent {
+            color: var(--rpi-green);
+        }
+
+        .status-card {
+            height: 100%;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 1rem;
+            transition:
+                transform .15s ease,
+                border-color .15s ease,
+                background .15s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(117, 192, 67, .5);
+            background: rgba(255, 255, 255, .065);
+        }
+
+        .status-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(117, 192, 67, .12);
+            color: var(--rpi-green);
+            font-size: 1.4rem;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            display: inline-block;
+            border-radius: 50%;
+            margin-right: .45rem;
+        }
+
+        .status-ok {
+            background: var(--rpi-green);
+            box-shadow: 0 0 8px rgba(117, 192, 67, .8);
+        }
+
+        .status-warning {
+            background: #ffc107;
+        }
+
+        .info-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 1rem;
+        }
+
+        .console {
+            background: #050709;
+            border: 1px solid #1f2933;
+            border-radius: .75rem;
+            padding: 1.25rem;
+            font-family:
+                ui-monospace,
+                SFMono-Regular,
+                Menlo,
+                Monaco,
+                Consolas,
+                monospace;
+            font-size: .85rem;
+            color: #a7b1ba;
+            min-height: 220px;
+            overflow: auto;
+        }
+
+        .console .prompt {
+            color: var(--rpi-green);
+        }
+
+        .console .dim {
+            color: #63707b;
+        }
+
+        .metric {
+            font-family:
+                ui-monospace,
+                SFMono-Regular,
+                Menlo,
+                Monaco,
+                Consolas,
+                monospace;
+            font-size: 1.05rem;
+        }
+
+        .btn-rpi {
+            --bs-btn-color: #061003;
+            --bs-btn-bg: var(--rpi-green);
+            --bs-btn-border-color: var(--rpi-green);
+            --bs-btn-hover-color: #061003;
+            --bs-btn-hover-bg: #8bd255;
+            --bs-btn-hover-border-color: #8bd255;
+            font-weight: 600;
+        }
+
+        footer {
+            color: #65717c;
+            border-top: 1px solid var(--panel-border);
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-3" href="#">
+            <span class="brand-mark">RPI</span>
+
+            <span>
+                <strong>RPi02W</strong>
+                <span class="text-secondary">Framework</span>
+            </span>
+        </a>
+
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbar">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Dashboard</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#system">System</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#console">Console</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#about">About</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<main>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center gy-5">
+
+                <div class="col-lg-8">
+                    <div class="text-uppercase small fw-semibold accent mb-3">
+                        Bare-metal Raspberry Pi
+                    </div>
+
+                    <h1>
+                        RPi Zero 2 W<br>
+                        <span class="accent">Framework</span>
+                    </h1>
+
+                    <p class="lead mt-4">
+                        A lightweight bare-metal application framework built
+                        on Circle for graphics, storage, USB input, networking,
+                        and embedded applications.
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <a href="#system" class="btn btn-rpi btn-lg">
+                            System Status
+                        </a>
+
+                        <a href="#console"
+                           class="btn btn-outline-secondary btn-lg">
+                            View Console
+                        </a>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-4">
+                    <div class="info-panel p-4">
+
+                        <div class="text-secondary small mb-1">
+                            DEVICE
+                        </div>
+
+                        <div class="fs-4 fw-semibold mb-4">
+                            Raspberry Pi Zero 2 W
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-secondary">Platform</span>
+                            <span class="metric">BCM2837</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-secondary">CPU</span>
+                            <span class="metric">ARM Cortex-A53</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-secondary">Memory</span>
+                            <span class="metric">512 MB</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <span class="text-secondary">Runtime</span>
+                            <span class="metric accent">Circle</span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- System Status -->
+    <section id="system" class="py-5">
+        <div class="container">
+
+            <div class="mb-4">
+                <div class="text-uppercase small fw-semibold accent">
+                    Hardware
+                </div>
+
+                <h2 class="fw-semibold">
+                    System Status
+                </h2>
+            </div>
+
+
+            <div class="row g-3">
+
+                <!-- Display -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="status-card p-4">
+
+                        <div class="status-icon mb-4">
+                            ▣
+                        </div>
+
+                        <h5>HDMI Display</h5>
+
+                        <div class="text-secondary mb-3">
+                            Framebuffer graphics
+                        </div>
+
+                        <div>
+                            <span class="status-dot status-ok"></span>
+                            <span class="small">Online</span>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- SD -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="status-card p-4">
+
+                        <div class="status-icon mb-4">
+                            ▤
+                        </div>
+
+                        <h5>SD Storage</h5>
+
+                        <div class="text-secondary mb-3">
+                            FAT filesystem
+                        </div>
+
+                        <div>
+                            <span class="status-dot status-ok"></span>
+                            <span class="small">Mounted</span>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- USB -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="status-card p-4">
+
+                        <div class="status-icon mb-4">
+                            ⌨
+                        </div>
+
+                        <h5>USB Host</h5>
+
+                        <div class="text-secondary mb-3">
+                            Keyboard &amp; mouse
+                        </div>
+
+                        <div>
+                            <span class="status-dot status-ok"></span>
+                            <span class="small">Ready</span>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- WLAN -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="status-card p-4">
+
+                        <div class="status-icon mb-4">
+                            ≋
+                        </div>
+
+                        <h5>WLAN</h5>
+
+                        <div class="text-secondary mb-3">
+                            802.11 wireless
+                        </div>
+
+                        <div>
+                            <span class="status-dot status-ok"></span>
+                            <span class="small">Connected</span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Runtime -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+
+                <div class="col-lg-5">
+                    <div class="info-panel p-4 h-100">
+
+                        <div class="text-uppercase small fw-semibold accent mb-2">
+                            Runtime
+                        </div>
+
+                        <h3 class="mb-4">Framework</h3>
+
+
+                        <div class="d-flex justify-content-between py-3
+                                    border-bottom border-secondary-subtle">
+                            <span class="text-secondary">Status</span>
+
+                            <span>
+                                <span class="status-dot status-ok"></span>
+                                Running
+                            </span>
+                        </div>
+
+
+                        <div class="d-flex justify-content-between py-3
+                                    border-bottom border-secondary-subtle">
+                            <span class="text-secondary">IP Address</span>
+                            <span class="metric">192.168.1.42</span>
+                        </div>
+
+
+                        <div class="d-flex justify-content-between py-3
+                                    border-bottom border-secondary-subtle">
+                            <span class="text-secondary">HTTP</span>
+                            <span class="metric">Port 80</span>
+                        </div>
+
+
+                        <div class="d-flex justify-content-between py-3">
+                            <span class="text-secondary">Uptime</span>
+                            <span class="metric">00:12:47</span>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="col-lg-7" id="console">
+                    <div class="info-panel p-4 h-100">
+
+                        <div class="d-flex justify-content-between
+                                    align-items-center mb-3">
+
+                            <div>
+                                <div class="text-uppercase small
+                                            fw-semibold accent">
+                                    Diagnostics
+                                </div>
+
+                                <h3 class="mb-0">System Console</h3>
+                            </div>
+
+                            <span class="badge text-bg-success">
+                                LIVE
+                            </span>
+                        </div>
+
+
+                        <div class="console">
+                            <div>
+                                <span class="dim">[00:00.000]</span>
+                                <span class="prompt">framework:</span>
+                                boot
+                            </div>
+
+                            <div>
+                                <span class="dim">[00:00.142]</span>
+                                display initialized
+                            </div>
+
+                            <div>
+                                <span class="dim">[00:00.318]</span>
+                                framebuffer ready
+                            </div>
+
+                            <div>
+                                <span class="dim">[00:00.562]</span>
+                                SD filesystem mounted
+                            </div>
+
+                            <div>
+                                <span class="dim">[00:00.841]</span>
+                                USB host initialized
+                            </div>
+
+                            <div>
+                                <span class="dim">[00:01.237]</span>
+                                keyboard detected
+                            </div>
+
+                            <div>
+                                <span class="dim">[00:01.241]</span>
+                                mouse detected
+                            </div>
+
+                            <div>
+                                <span class="dim">[00:02.913]</span>
+                                WLAN connected
+                            </div>
+
+                            <div>
+                                <span class="dim">[00:02.917]</span>
+                                DHCP: 192.168.1.42
+                            </div>
+
+                            <div>
+                                <span class="dim">[00:02.940]</span>
+                                HTTP server listening on port 80
+                            </div>
+
+                            <br>
+
+                            <div>
+                                <span class="prompt">rpi02w&gt;</span>
+                                _
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- About -->
+    <section id="about" class="py-5">
+        <div class="container">
+
+            <div class="info-panel p-4 p-md-5">
+
+                <div class="row align-items-center gy-4">
+
+                    <div class="col-lg-8">
+                        <div class="text-uppercase small fw-semibold accent mb-2">
+                            RPi02W Framework
+                        </div>
+
+                        <h2>
+                            One foundation for bare-metal applications.
+                        </h2>
+
+                        <p class="text-secondary mb-0">
+                            Initialize the hardware once and build applications
+                            on top of a common graphics, storage, input,
+                            networking, and web infrastructure.
+                        </p>
+                    </div>
+
+
+                    <div class="col-lg-4 text-lg-end">
+                        <span class="badge rounded-pill
+                                     text-bg-secondary px-3 py-2">
+                            Circle
+                        </span>
+
+                        <span class="badge rounded-pill
+                                     text-bg-secondary px-3 py-2">
+                            C++
+                        </span>
+
+                        <span class="badge rounded-pill
+                                     text-bg-secondary px-3 py-2">
+                            ARM
+                        </span>
+
+                        <span class="badge rounded-pill
+                                     text-bg-secondary px-3 py-2">
+                            Bare Metal
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+
+<footer class="mt-5 py-4">
+    <div class="container d-flex justify-content-between flex-wrap gap-2">
+
+        <span>
+            RPi Zero 2 W Framework
+        </span>
+
+        <span>
+            Powered by Circle
+        </span>
+
+    </div>
+</footer>
+
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
