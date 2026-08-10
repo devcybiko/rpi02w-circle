@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/greg/git/rpi02w-circle/lvgl/lv_version.h
+
+/Users/greg/git/rpi02w-circle/lvgl/src/draw/sw/blend/helium/lv_blend_helium.S
+Pre_Include_Global.h
+/Users/greg/git/rpi02w-circle/lvgl/src/draw/sw/blend/helium/Pre_Include_Global.h
+RTE_Components.h
+/Users/greg/git/rpi02w-circle/lvgl/src/draw/sw/blend/helium/RTE_Components.h
+../../../../lv_conf_internal.h
+/Users/greg/git/rpi02w-circle/lvgl/src/lv_conf_internal.h
+
+/Users/greg/git/rpi02w-circle/lvgl/src/lv_conf_internal.h
+lv_conf_kconfig.h
+/Users/greg/git/rpi02w-circle/lvgl/src/lv_conf_kconfig.h
+lv_conf.h
+/Users/greg/git/rpi02w-circle/lvgl/src/lv_conf.h
+../../lv_conf.h
+/Users/greg/git/rpi02w-circle/lv_conf.h
+my_include.h
+/Users/greg/git/rpi02w-circle/lvgl/src/my_include.h
+
+/Users/greg/git/rpi02w-circle/lvgl/src/lv_conf_kconfig.h
+sdkconfig.h
+/Users/greg/git/rpi02w-circle/lvgl/src/sdkconfig.h
+esp_attr.h
+/Users/greg/git/rpi02w-circle/lvgl/src/esp_attr.h
+nuttx/config.h
+-
+../lv_version.h
+/Users/greg/git/rpi02w-circle/lvgl/lv_version.h
+lv_rt_thread_conf.h
+-
+
+/Users/greg/git/rpi02w-circle/projects/guiapp/macos/lv_conf.h
+

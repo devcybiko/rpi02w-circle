@@ -8,14 +8,15 @@ AARCH = 32
 
 OBJS = main.o kernel.o core.o core0.o core1.o core2.o core3.o \
 dispatcher.o drawservice.o dummyservice.o event.o eventqueue.o eventrouter.o \
-guiservice.o hidservice.o loggerservice.o \
+../guiapp/rpi/guiservice.o ../guiapp/shared/guiapp.o \
+hidservice.o loggerservice.o \
 screenservice.o serialservice.o service.o storageservice.o webserver.o \
 webserverservice.o
 
 DEFINE += -DARM_ALLOW_MULTI_CORE
 DEFINE += -DLV_CONF_INCLUDE_SIMPLE
 
-INCLUDE += -I $(LVGLHOME) -I .
+INCLUDE += -I $(LVGLHOME) -I . -I ../guiapp/rpi -I ../guiapp/shared
 
 LIBS = $(LVGLHOME)/liblvgl-circle.a \
 $(CIRCLEHOME)/addon/wlan/hostap/wpa_supplicant/libwpa_supplicant.a \

@@ -1,0 +1,15 @@
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/CMakeFiles/guiapp-macos.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/CMakeFiles/edit_cache.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/CMakeFiles/rebuild_cache.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/CMakeFiles/list_install_components.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/CMakeFiles/install.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/CMakeFiles/install/local.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/CMakeFiles/install/strip.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/lvgl/CMakeFiles/lvgl.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/lvgl/CMakeFiles/lvgl_thorvg.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/lvgl/CMakeFiles/edit_cache.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/lvgl/CMakeFiles/rebuild_cache.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/lvgl/CMakeFiles/list_install_components.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/lvgl/CMakeFiles/install.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/lvgl/CMakeFiles/install/local.dir
+/Users/greg/git/rpi02w-circle/build/guiapp-macos/lvgl/CMakeFiles/install/strip.dir

@@ -6,7 +6,7 @@
 #include "serialservice.h"
 #include "storageservice.h"
 #include "webserverservice.h"
-#include "guiservice.h"
+#include <guiservice.h>
 
 #define DRIVE		"SD:"
 #define FIRMWARE_PATH	DRIVE "/firmware/"

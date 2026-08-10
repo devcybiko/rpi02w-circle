@@ -334,6 +334,13 @@ The current response is:
 
 ## Build
 
+## Shared LVGL UI
+
+`projects/guiapp/shared/` contains the LVGL-only application code. Its
+platform adapters are deliberately separate: `projects/guiapp/rpi/` provides
+the Circle HDMI framebuffer integration, and `projects/guiapp/macos/` provides
+the SDL simulator. See the macOS README for its build command.
+
 Initialize Circle and its nested WLAN dependency:
 
 ```sh
