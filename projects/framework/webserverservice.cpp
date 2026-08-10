@@ -3,6 +3,7 @@
 #include <circle/logger.h>
 #include <circle/string.h>
 #include <assert.h>
+#include <string.h>
 
 static const char FromWebServerService[] = "webserver";
 
@@ -26,6 +27,7 @@ CWebServerService::CWebServerService (const char *pFirmwarePath,
 	assert (m_pTimer != 0);
 	assert (m_pScreen != 0);
 	assert (m_pWebRoot != 0);
+	strcpy (m_name, "webserver");
 }
 
 CWebServerService::~CWebServerService (void)
@@ -93,4 +95,11 @@ void CWebServerService::Update (void)
 
 void CWebServerService::OnEvent (const Event &)
 {
+}
+
+CString CWebServerService::GetIPAddress (void)
+{
+	CString IPAddress;
+	m_Net.GetConfig ()->GetIPAddress ()->Format (&IPAddress);
+	return IPAddress;
 }

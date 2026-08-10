@@ -5,6 +5,7 @@
 
 #include <circle/net/netsubsystem.h>
 #include <circle/screen.h>
+#include <circle/string.h>
 #include <circle/timer.h>
 #include <wlan/bcm4343.h>
 #include <wlan/hostap/wpa_supplicant/wpasupplicant.h>
@@ -20,6 +21,7 @@ public:
 	boolean InitService (void) override;
 	void Update (void) override;
 	void OnEvent (const Event &EventToHandle) override;
+	CString GetIPAddress (void);
 
 private:
 	const char *m_pFirmwarePath;

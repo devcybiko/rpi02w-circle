@@ -6,6 +6,7 @@
 #include "serialservice.h"
 #include "storageservice.h"
 #include "webserverservice.h"
+#include "guiservice.h"
 
 #define DRIVE		"SD:"
 #define FIRMWARE_PATH	DRIVE "/firmware/"
@@ -41,7 +42,7 @@ boolean CCore0::Initialize (void)
 		bOK = m_Dispatcher.AddService (pScreenService);
 	}
 
-	if (bOK) bOK = m_Dispatcher.AddService (new CDrawService (pScreenService));
+	// if (bOK) bOK = m_Dispatcher.AddService (new CDrawService (pScreenService));
 	if (bOK) bOK = m_Dispatcher.AddService (new CSerialService (115200));
 	if (bOK) bOK = m_Dispatcher.AddService (new CLoggerService (
 		m_Options.GetLogLevel (), &m_Timer, &m_DeviceNameService,
@@ -52,6 +53,7 @@ boolean CCore0::Initialize (void)
 		&m_Interrupt, &m_Timer, &m_ActLED, DRIVE));
 	if (bOK) bOK = m_Dispatcher.AddService (new CWebServerService (
 		FIRMWARE_PATH, CONFIG_FILE, &m_Timer, pScreen, WEB_ROOT));
+	if (bOK) bOK = m_Dispatcher.AddService (new CGuiService (pScreenService));
 
 	for (unsigned nType = static_cast<unsigned> (EventType::None) + 1;
 	     bOK && nType < static_cast<unsigned> (EventType::Count); nType++)

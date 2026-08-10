@@ -4,6 +4,7 @@
 #include <circle/sched/scheduler.h>
 #include <circle/timer.h>
 #include <assert.h>
+#include <string.h>
 
 CDispatcher::CDispatcher (CEventQueue *pEventQueue, CScheduler *pScheduler)
 : m_pEventQueue (pEventQueue),
@@ -83,6 +84,24 @@ boolean CDispatcher::InitServices (void)
 	return TRUE;
 }
 
+CService *CDispatcher::FindService (const char *pName)
+{
+	if (pName == 0)
+	{
+		return 0;
+	}
+
+	for (unsigned nService = 0; nService < m_nServiceCount; nService++)
+	{
+		CService *pService = m_pServices[nService];
+		if (strcmp (pService->m_name, pName) == 0)
+		{
+			return pService;
+		}
+	}
+
+	return 0;
+}
 void CDispatcher::UpdateServices (void)
 {
 	assert (m_bInitialized);
@@ -97,6 +116,11 @@ void CDispatcher::UpdateServices (void)
 			pService->Update ();
 			pService->ResetTimer ();
 		}
+	}
+
+	if (m_pScheduler != 0)
+	{
+		m_pScheduler->Yield ();
 	}
 }
 

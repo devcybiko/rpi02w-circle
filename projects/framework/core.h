@@ -24,6 +24,10 @@ public:
 	boolean Post (const Event &EventToPost);
 	u32 Publish (const Event &EventToPublish);
 	virtual void Run (void);
+	CService *FindService (const char *pName)
+	{
+		return m_Dispatcher.FindService (pName);
+	}
 
 protected:
 	boolean Subscribe (EventType Type);

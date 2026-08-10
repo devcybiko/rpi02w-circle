@@ -16,6 +16,7 @@ public:
 	virtual boolean InitService (void);
 	virtual void Update (void) = 0;
 	virtual void OnEvent (const Event &EventToHandle) = 0;
+	char m_name[16] = "service";
 
 protected:
 	// Period in milliseconds, or one of the Period* sentinels above.

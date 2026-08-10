@@ -21,6 +21,7 @@ public:
 	boolean InitServices (void);
 	void UpdateServices (void);
 	void Dispatch (const Event &EventToDispatch);
+	CService *FindService (const char *pName);
 
 private:
 	CEventQueue *m_pEventQueue;

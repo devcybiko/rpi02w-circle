@@ -46,8 +46,8 @@ void CLoggerService::OnEvent (const Event &event)
 	memcpy (Message, event.logger.message, sizeof event.logger.message);
 	Message[sizeof event.logger.message] = '\0';
 
-	m_Logger.Write ("logger_service",
-			static_cast<TLogSeverity> (event.logger.level), "%s", Message);
+	// m_Logger.Write ("logger_service",
+	// 		static_cast<TLogSeverity> (event.logger.level), "%s", Message);
 }
 
 CLogger *CLoggerService::GetLogger (void)

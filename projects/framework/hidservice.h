@@ -39,6 +39,7 @@ private:
 	CUSBHCIDevice m_USBHCI;
 	CUSBKeyboardDevice * volatile m_pKeyboard;
 	CMouseDevice * volatile m_pMouse;
+	unsigned m_nMouseButtons;
 
 	static CHIDService *s_pThis;
 };

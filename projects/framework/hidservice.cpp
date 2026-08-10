@@ -16,7 +16,8 @@ CHIDService::CHIDService (CInterruptSystem *pInterruptSystem, CTimer *pTimer,
   m_pScreen (pScreen),
   m_USBHCI (pInterruptSystem, pTimer, TRUE),
   m_pKeyboard (0),
-  m_pMouse (0)
+  m_pMouse (0),
+  m_nMouseButtons (0)
 {
 	assert (s_pThis == 0);
 	assert (pInterruptSystem != 0);
@@ -162,13 +163,30 @@ void CHIDService::MouseRemovedHandler (CDevice *, void *)
 {
 	assert (s_pThis != 0);
 	s_pThis->m_pMouse = 0;
+	s_pThis->m_nMouseButtons = 0;
 	CLogger::Get ()->Write (FromHIDService, LogNotice, "USB mouse removed");
 }
 
 void CHIDService::MouseEventHandler (TMouseEvent Event, unsigned nButtons,
 				     unsigned nPosX, unsigned nPosY, int nWheelMove)
 {
-	pCore0->Publish (Event::Mouse (Event, nButtons, nPosX, nPosY, nWheelMove));
+	assert (s_pThis != 0);
+
+	if (Event == MouseEventMouseDown)
+	{
+		s_pThis->m_nMouseButtons |= nButtons;
+	}
+	else if (Event == MouseEventMouseUp)
+	{
+		s_pThis->m_nMouseButtons &= ~nButtons;
+	}
+	else
+	{
+		s_pThis->m_nMouseButtons = nButtons;
+	}
+
+	pCore0->Publish (Event::Mouse (Event, s_pThis->m_nMouseButtons,
+				      nPosX, nPosY, nWheelMove));
 }
 
 boolean CHIDService::LogDevice (CDevice *pDevice, const char *pName,
