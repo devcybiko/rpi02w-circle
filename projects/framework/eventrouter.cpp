@@ -1,6 +1,7 @@
 #include "eventrouter.h"
 
 #include <circle/multicore.h>
+#include <circle/logger.h>
 #include <assert.h>
 
 CEventRouter::CEventRouter (void)
@@ -92,6 +93,7 @@ u32 CEventRouter::Publish (unsigned nSourceCore, const Event &EventToPublish)
 	if (nSourceCore >= CoreCount || EventToPublish.type == EventType::None
 	    || EventToPublish.type >= EventType::Count)
 	{
+		CLogger::Get ()->Write ("eventrouter.cpp", LogError, "Publish: sourceCore=%u, type=%u", nSourceCore, static_cast<unsigned> (EventToPublish.type));
 		return 0;
 	}
 
@@ -103,7 +105,7 @@ u32 CEventRouter::Publish (unsigned nSourceCore, const Event &EventToPublish)
 	m_Lock.Acquire ();
 	for (unsigned nCore = 0; nCore < CoreCount; nCore++)
 	{
-		if (nCore != nSourceCore && (m_Subscriptions[nCore] & TypeBit) != 0)
+		if ((m_Subscriptions[nCore] & TypeBit) != 0)
 		{
 			bRecipients[nCore] = m_Endpoints[nCore].pQueue != 0;
 		}

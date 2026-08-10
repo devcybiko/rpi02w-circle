@@ -1,5 +1,6 @@
 #include "loggerservice.h"
 
+#include <circle/util.h>
 #include <assert.h>
 
 CLoggerService::CLoggerService (unsigned nLogLevel, CTimer *pTimer,
@@ -34,8 +35,19 @@ void CLoggerService::Update (void)
 {
 }
 
-void CLoggerService::OnEvent (const Event &)
+void CLoggerService::OnEvent (const Event &event)
 {
+	if (event.type != EventType::Logger || event.logger.level > LogDebug)
+	{
+		return;
+	}
+
+	char Message[sizeof event.logger.message + 1];
+	memcpy (Message, event.logger.message, sizeof event.logger.message);
+	Message[sizeof event.logger.message] = '\0';
+
+	m_Logger.Write ("logger_service",
+			static_cast<TLogSeverity> (event.logger.level), "%s", Message);
 }
 
 CLogger *CLoggerService::GetLogger (void)

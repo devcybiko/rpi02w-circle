@@ -1,10 +1,17 @@
 #pragma once
 
+#include "dispatcher.h"
 #include "eventqueue.h"
 
 #include <circle/types.h>
 
 class CEventRouter;
+class CCore;
+
+extern CCore *pCore0;
+extern CCore *pCore1;
+extern CCore *pCore2;
+extern CCore *pCore3;
 
 class CCore
 {
@@ -12,18 +19,24 @@ public:
 	CCore (CEventRouter *pEventRouter, unsigned nCore, boolean bNeedsWakeUp);
 	virtual ~CCore (void);
 
+	static CCore *GetCore (unsigned nCore);
+
+	boolean Post (const Event &EventToPost);
+	u32 Publish (const Event &EventToPublish);
 	virtual void Run (void);
 
 protected:
-	boolean SendEventToCore (unsigned nCore, const Event &EventToSend);
 	boolean Subscribe (EventType Type);
 	boolean Unsubscribe (EventType Type);
-	u32 PublishEvent (const Event &EventToPublish);
 	void ProcessEvents (void);
-	virtual void HandleEvent (const Event &EventToHandle) = 0;
 
 private:
+	static CCore *s_pCores[];
+
 	CEventRouter *m_pEventRouter;
 	unsigned m_nCore;
 	CEventQueue m_EventQueue;
+
+protected:
+	CDispatcher m_Dispatcher;
 };

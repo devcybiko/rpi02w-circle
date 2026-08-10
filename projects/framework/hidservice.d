@@ -64,5 +64,5 @@ hidservice.o hidservice.d: hidservice.cpp hidservice.h service.h event.h \
  ../../circle/include/circle/usb/usbhiddevice.h \
  ../../circle/include/circle/input/keyboardbehaviour.h \
  ../../circle/include/circle/input/keymap.h \
- ../../circle/include/circle/usb/usbhid.h \
- ../../circle/include/circle/util.h
+ ../../circle/include/circle/usb/usbhid.h core.h dispatcher.h \
+ eventqueue.h ../../circle/include/circle/util.h

@@ -14,4 +14,4 @@ loggerservice.o loggerservice.d: loggerservice.cpp loggerservice.h \
  ../../circle/include/circle/interrupt.h \
  ../../circle/include/circle/bcm2835int.h \
  ../../circle/include/circle/exceptionstub.h \
- ../../circle/include/circle/time.h
+ ../../circle/include/circle/time.h ../../circle/include/circle/util.h

@@ -1,35 +1,47 @@
-core0.o core0.d: core0.cpp core0.h core.h eventqueue.h event.h \
- ../../circle/include/circle/types.h ../../circle/include/assert.h \
- ../../circle/include/circle/macros.h \
+core0.o core0.d: core0.cpp core0.h core.h dispatcher.h eventqueue.h \
+ event.h ../../circle/include/circle/types.h \
+ ../../circle/include/assert.h ../../circle/include/circle/macros.h \
  ../../circle/include/circle/spinlock.h \
  ../../circle/include/circle/sysconfig.h \
  ../../circle/include/circle/memorymap.h \
- ../../circle/include/circle/synchronize.h hidservice.h service.h \
+ ../../circle/include/circle/synchronize.h service.h \
+ ../../circle/include/circle/actled.h \
+ ../../circle/include/circle/gpiopin.h \
+ ../../circle/include/circle/virtualgpiopin.h \
+ ../../circle/include/circle/koptions.h \
+ ../../circle/include/circle/bcmpropertytags.h \
+ ../../circle/include/circle/bcmmailbox.h \
+ ../../circle/include/circle/bcm2835.h \
+ ../../circle/include/circle/cputhrottle.h \
  ../../circle/include/circle/devicenameservice.h \
  ../../circle/include/circle/device.h \
  ../../circle/include/circle/ptrlist.h \
  ../../circle/include/circle/string.h \
  ../../circle/include/circle/stdarg.h \
- ../../circle/include/circle/input/mouse.h \
- ../../circle/include/circle/display.h \
- ../../circle/include/circle/input/mousebehaviour.h \
- ../../circle/include/circle/numberpool.h \
+ ../../circle/include/circle/exceptionhandler.h \
+ ../../circle/include/circle/exception.h \
+ ../../circle/include/circle/exceptionstub.h \
  ../../circle/include/circle/interrupt.h \
  ../../circle/include/circle/bcm2835int.h \
- ../../circle/include/circle/exceptionstub.h \
- ../../circle/include/circle/screen.h \
+ ../../circle/include/circle/timer.h \
+ ../../circle/include/circle/sched/scheduler.h \
+ ../../circle/include/circle/sched/task.h \
+ ../../circle/include/circle/sched/taskswitch.h \
+ ../../circle/include/circle/sched/synchronizationevent.h \
+ ../../circle/include/circle/startup.h drawservice.h screenservice.h \
+ ../../circle/include/circle/2dgraphics.h \
+ ../../circle/include/circle/display.h \
  ../../circle/include/circle/bcmframebuffer.h \
- ../../circle/include/circle/bcmpropertytags.h \
- ../../circle/include/circle/bcmmailbox.h \
- ../../circle/include/circle/bcm2835.h \
  ../../circle/include/circle/dmachannel.h \
  ../../circle/include/circle/dmacommon.h \
  ../../circle/include/circle/machineinfo.h \
  ../../circle/include/circle/devicetreeblob.h \
- ../../circle/include/circle/gpiopin.h \
- ../../circle/include/circle/terminal.h \
  ../../circle/include/circle/chargenerator.h \
- ../../circle/include/circle/font.h ../../circle/include/circle/timer.h \
+ ../../circle/include/circle/font.h ../../circle/include/circle/screen.h \
+ ../../circle/include/circle/terminal.h hidservice.h \
+ ../../circle/include/circle/input/mouse.h \
+ ../../circle/include/circle/input/mousebehaviour.h \
+ ../../circle/include/circle/numberpool.h \
  ../../circle/include/circle/usb/usbhcidevice.h \
  ../../circle/include/circle/usb/dwhcidevice.h \
  ../../circle/include/circle/usb/usbhostcontroller.h \
@@ -64,10 +76,9 @@ core0.o core0.d: core0.cpp core0.h core.h eventqueue.h event.h \
  ../../circle/include/circle/usb/usbhiddevice.h \
  ../../circle/include/circle/input/keyboardbehaviour.h \
  ../../circle/include/circle/input/keymap.h \
- ../../circle/include/circle/usb/usbhid.h loggerservice.h screenservice.h \
- serialservice.h ../../circle/include/circle/serial.h storageservice.h \
- ../../circle/addon/SDCard/emmc.h ../../circle/include/circle/actled.h \
- ../../circle/include/circle/virtualgpiopin.h \
+ ../../circle/include/circle/usb/usbhid.h loggerservice.h serialservice.h \
+ ../../circle/include/circle/serial.h storageservice.h \
+ ../../circle/addon/SDCard/emmc.h \
  ../../circle/include/circle/fs/partitionmanager.h \
  ../../circle/include/circle/fs/partition.h \
  ../../circle/addon/SDCard/sdhost.h ../../circle/addon/SDCard/mmchost.h \
@@ -77,10 +88,6 @@ core0.o core0.d: core0.cpp core0.h core.h eventqueue.h event.h \
  /opt/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/15.2.1/include/stdint-gcc.h \
  webserverservice.h webserver.h \
  ../../circle/include/circle/net/httpdaemon.h \
- ../../circle/include/circle/sched/task.h \
- ../../circle/include/circle/sched/taskswitch.h \
- ../../circle/include/circle/sched/synchronizationevent.h \
- ../../circle/include/circle/startup.h \
  ../../circle/include/circle/net/netsubsystem.h \
  ../../circle/include/circle/net/netconfig.h \
  ../../circle/include/circle/net/ipaddress.h \
@@ -109,9 +116,4 @@ core0.o core0.d: core0.cpp core0.h core.h eventqueue.h event.h \
  ../../circle/include/circle/net/netsocket.h \
  ../../circle/include/circle/net/error.h \
  ../../circle/addon/wlan/bcm4343.h ../../circle/addon/wlan/etherevent.h \
- ../../circle/addon/wlan/hostap/wpa_supplicant/wpasupplicant.h \
- ../../circle/include/circle/koptions.h \
- ../../circle/include/circle/cputhrottle.h \
- ../../circle/include/circle/exceptionhandler.h \
- ../../circle/include/circle/exception.h \
- ../../circle/include/circle/sched/scheduler.h
+ ../../circle/addon/wlan/hostap/wpa_supplicant/wpasupplicant.h

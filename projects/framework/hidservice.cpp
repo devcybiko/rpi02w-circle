@@ -1,4 +1,5 @@
 #include "hidservice.h"
+#include "core.h"
 
 #include <circle/logger.h>
 #include <circle/util.h>
@@ -147,7 +148,7 @@ void CHIDService::AttachMouse (void)
 void CHIDService::KeyPressedHandler (const char *pString)
 {
 	assert (s_pThis != 0);
-	s_pThis->m_pScreen->Write (pString, strlen (pString));
+	pCore0->Publish (Event::Key (*pString, TRUE));
 }
 
 void CHIDService::KeyboardRemovedHandler (CDevice *, void *)
@@ -167,10 +168,7 @@ void CHIDService::MouseRemovedHandler (CDevice *, void *)
 void CHIDService::MouseEventHandler (TMouseEvent Event, unsigned nButtons,
 				     unsigned nPosX, unsigned nPosY, int nWheelMove)
 {
-	// CLogger::Get ()->Write (FromHIDService, LogNotice,
-	// 		       "USB mouse event: event=%u, x=%u, y=%u, buttons=%u, wheel=%d",
-	// 		       static_cast<unsigned> (Event), nPosX, nPosY,
-	// 		       nButtons, nWheelMove);
+	pCore0->Publish (Event::Mouse (Event, nButtons, nPosX, nPosY, nWheelMove));
 }
 
 boolean CHIDService::LogDevice (CDevice *pDevice, const char *pName,

@@ -9,4 +9,13 @@ eventrouter.o eventrouter.d: eventrouter.cpp eventrouter.h eventqueue.h \
  ../../circle/include/circle/memory.h \
  ../../circle/include/circle/pagetable.h \
  ../../circle/include/circle/heapallocator.h \
- ../../circle/include/circle/pageallocator.h
+ ../../circle/include/circle/pageallocator.h \
+ ../../circle/include/circle/logger.h \
+ ../../circle/include/circle/device.h \
+ ../../circle/include/circle/ptrlist.h \
+ ../../circle/include/circle/string.h \
+ ../../circle/include/circle/stdarg.h ../../circle/include/circle/timer.h \
+ ../../circle/include/circle/interrupt.h \
+ ../../circle/include/circle/bcm2835int.h \
+ ../../circle/include/circle/exceptionstub.h \
+ ../../circle/include/circle/time.h

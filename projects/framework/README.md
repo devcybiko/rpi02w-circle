@@ -175,11 +175,12 @@ scheduler loop.
 The virtual `CCore::HandleEvent()` method is the extension point each subclass
 implements to add core-specific behavior for each event type.
 
-## Service executor
+## Service dispatcher
 
-`CService` and `CExecutor` provide a standalone foundation for future
-core-local services. `CExecutor` is compiled into the framework but is not yet
-connected to `CCore`.
+`CService` and `CDispatcher` provide the core-local service runtime. Every
+`CCore` owns a dispatcher connected to that core's event queue. Core 0 registers
+Screen, Serial, Logger, HID, Storage, and Web services in that dependency order
+and supplies its Circle scheduler to the inherited dispatcher.
 
 A service implements:
 
@@ -189,37 +190,38 @@ A service implements:
 
 The base `InitService()` returns `TRUE`, so services without startup work do not
 have to override it. Constructors should only store dependencies and initialize
-local state; hardware access belongs in `Initialize()` or later methods.
+local state; hardware access belongs in `InitService()` or later methods.
 
 Each service contains `m_timeout`, an absolute deadline in Circle's continuous
 1 MHz clock ticks, and `m_periodMS`, its update period in milliseconds. The
 period is passed to the `CService` constructor. After calling `Update()`, the
-executor automatically calls `ResetTimer()` to schedule the next deadline.
-Pass `CService::PeriodPolling` to call `Update()` on every executor pass, or
+dispatcher automatically calls `ResetTimer()` to schedule the next deadline.
+Pass `CService::PeriodPolling` to call `Update()` on every dispatcher pass, or
 `CService::PeriodDisabled` for an event-only service. These sentinels have the
 values `0` and `UINT32_MAX`, respectively; other values are periods in
 milliseconds.
 
-After all services are registered, `CExecutor::Initialize()` initializes them
-in registration order and starts their timers. Registration is rejected after
-successful executor initialization, and `Run()` requires initialization first.
-If any service fails, executor initialization returns `FALSE` and does not
-start the run loop.
+After all services are registered, `CDispatcher::InitServices()` iterates over
+them in registration order, calls each service's `InitService()`, and starts
+its timer. Registration is rejected after successful service initialization,
+and `Run()` requires initialization first. If any service fails,
+`InitServices()` returns `FALSE` and does not start the run loop.
 
-An executor is constructed with an event queue and accepts up to 64 service
+The dispatcher is constructed with an event queue and accepts up to 64 service
 registrations. Its hard `Run()` loop first calls `Update()` on every service
 whose deadline has expired. It then pops at most one event and passes that
 event to every registered service's `OnEvent()` method. Services are
 responsible for ignoring event types that do not interest them. Processing one
-event per pass ensures timeout checks occur between queued events.
+event per pass ensures timeout checks occur between queued events. Core 0 gives
+its dispatcher a scheduler pointer, so each pass yields to cooperative tasks such
+as the HTTP server.
 
 `CHIDService` owns `CUSBHCIDevice` and all USB keyboard and mouse behavior. It
 initializes the USB host controller, performs task-level plug-and-play polling,
 discovers attached input devices, handles removal and input callbacks, updates
 keyboard LEDs and the mouse cursor, configures the framebuffer cursor, and
-logs attachment changes. Core 0 initializes it after the timer and calls its
-polling `Update()` from the existing loop. Its `OnEvent()` remains a no-op
-until executor registration is introduced.
+logs attachment changes. Core 0 registers it after the logger, and the dispatcher
+calls its polling `Update()`. Its `OnEvent()` currently ignores core events.
 
 `CScreenService` owns and initializes `CScreenDevice`. It is event-only and
 requires no periodic update. Core 0 uses its screen accessor for logger output
@@ -247,7 +249,8 @@ scheduler task. Its `InitService()` preserves the required
 `WLAN → Network → WPA` order after storage has mounted the firmware and
 configuration files. Its `Update()` waits for DHCP/network readiness, logs the
 assigned address, creates the web-server task once, and logs the listening port
-and document root. Core 0 calls `Update()` from its existing loop.
+and document root. It is registered last with core 0's dispatcher so storage and
+all device dependencies are ready before its initialization begins.
 
 ## SD-card files
 

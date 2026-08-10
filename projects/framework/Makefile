@@ -5,7 +5,7 @@ RASPPI = 3
 AARCH = 32
 
 OBJS = main.o kernel.o core.o core0.o core1.o core2.o core3.o \
-	   eventqueue.o eventrouter.o executor.o hidservice.o loggerservice.o \
+	   dispatcher.o drawservice.o dummyservice.o event.o eventqueue.o eventrouter.o hidservice.o loggerservice.o \
 	   screenservice.o serialservice.o service.o storageservice.o webserver.o \
 	   webserverservice.o
 

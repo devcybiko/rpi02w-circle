@@ -28,5 +28,5 @@ private:
 	void ResetTimer (void);
 	boolean IsUpdateDue (u64 nNow) const;
 
-	friend class CExecutor;
+	friend class CDispatcher;
 };
